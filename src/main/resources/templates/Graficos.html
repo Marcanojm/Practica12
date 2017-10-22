@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+        <script src="js/jquery-3.2.1.min.js"></script>
+        <script>
+            var webSocket;
+            var tiempoReconectar = 5000;
+            var datos = [['FechaGeneracion', 'Temperatura', 'Humedad']];
+            var datos1 = [['FechaGeneracion', 'Temperatura', 'Humedad']];
+
+            function recibirInformacionServidor(mensaje){
+
+                var dato = JSON.parse(mensaje.data);
+
+                if(dato.IdDispositivo == 1) {
+                    google.charts.load('current', {'packages':['corechart']});
+                    google.charts.setOnLoadCallback(drawChart);
+                    datos.push(new Array(dato.fechaGeneracion, dato.temperatura, dato.humedad));
+
+                    function drawChart() {
+                        var data = google.visualization.arrayToDataTable(datos);
+
+                        var options = {
+                            title: 'Sensor 1',
+                            curveType: 'function',
+                            legend: { position: 'bottom' }
+                        };
+
+                        var chart = new google.visualization.LineChart(document.getElementById('curve_chart'));
+                        chart.draw(data, options);
+                    }
+                }else if(dato.IdDispositivo == 2) {
+                    google.charts.load('current', {'packages': ['corechart']});
+                    google.charts.setOnLoadCallback(drawChart1);
+                    datos1.push(new Array(dato.fechaGeneracion, dato.temperatura, dato.humedad));
+
+                    function drawChart1() {
+                        var data1 = google.visualization.arrayToDataTable(datos1);
+
+                        var options1 = {
+                            title: 'Sensor 2',
+                            curveType: 'function',
+                            legend: {position: 'bottom'}
+                        };
+
+                        var chart1 = new google.visualization.LineChart(document.getElementById('curve_chart1'));
+                        chart1.draw(data1, options1);
+                    }
+                }
+            }
+
+            function conectar() {
+                webSocket = new WebSocket("ws://" + location.hostname + ":" + location.port + "/mensajeServidor");
+                webSocket.onmessage = function(data){recibirInformacionServidor(data);};
+            }
+
+            function verificarConexion(){
+                if(!webSocket || webSocket.readyState == 3){
+                    conectar();
+                }
+            }
+
+            setInterval(verificarConexion, tiempoReconectar);
+        </script>
+    </head>
+    <body>
+        <div id="curve_chart" style="width: 900px; height: 500px; float:left;"></div>
+        <div id="curve_chart1" style="width: 900px; height: 500px; float:right;"></div>
+        <div id="prueba"></div>
+    </body>
+</html>
