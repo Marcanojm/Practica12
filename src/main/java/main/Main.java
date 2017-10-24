@@ -1,6 +1,8 @@
 package main;
 
+import Utilidades.JsonUtilidades;
 import jms.Consumidor;
+import services.EndPointServices;
 import websocket.ServidorMensajesWebSocketHandler;
 import freemarker.template.Configuration;
 import freemarker.template.Template;
@@ -35,6 +37,7 @@ public class Main {
             StringWriter writer = new StringWriter();
             Map<String, Object> attributes = new HashMap<>();
 
+            attributes.put("registros", "{\"registros\":" + JsonUtilidades.toJson(EndPointServices.getInstancia().findAll()) + "}");
             resultTemplate.process(attributes, writer);
             return writer;
         });

@@ -1,8 +1,11 @@
 package jms;
 
+import entidades.EndPoint;
 import org.apache.activemq.ActiveMQConnectionFactory;
 import org.json.JSONException;
 import org.json.JSONObject;
+import services.EndPointServices;
+
 import javax.jms.*;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -35,6 +38,7 @@ public class Productor {
                     json.put("IdDispositivo", sensor);
                     json.put("temperatura", Math.ceil(Math.random() * 41));
                     json.put("humedad",  Math.ceil(Math.random() * 15));
+                    EndPointServices.getInstancia().crear(new EndPoint(formato.format(new Date()), sensor, Math.ceil(Math.random() * 41), Math.ceil(Math.random() * 15)));
 
                     System.out.println(json);
                 } catch (JSONException e) {
